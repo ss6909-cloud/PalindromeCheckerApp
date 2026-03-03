@@ -1,39 +1,35 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 public class PalindromeCheckerApp {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("=== Palindrome Checker App ===");
+        System.out.println("=== Palindrome Checker App (All Use Cases) ===");
         System.out.print("Enter a string: ");
         String input = scanner.nextLine();
 
-        // Existing Use Cases
-        checkUsingStringReversal(input);
-        checkUsingCharArray(input);
-        checkUsingStack(input);
-
-        // UC6: Queue + Stack Based Check
-        checkUsingQueueAndStack(input);
+        // Executing all implemented Use Cases
+        checkUC1_StringReversal(input);
+        checkUC4_CharArrayTwoPointer(input);
+        checkUC5_StackLIFO(input);
+        checkUC6_StackAndQueue(input);
+        checkUC7_DequeOptimized(input);
 
         scanner.close();
     }
 
-    // --- UC1/2: String Reversal Method ---
-    public static void checkUsingStringReversal(String input) {
+    // --- UC1: Basic String Reversal ---
+    public static void checkUC1_StringReversal(String input) {
         String reversed = "";
         for (int i = input.length() - 1; i >= 0; i--) {
-            reversed = reversed + input.charAt(i);
+            reversed += input.charAt(i);
         }
-        System.out.println("\n[UC1/2: String Reversal] Result: " + (input.equals(reversed) ? "Palindrome" : "NOT a Palindrome"));
+        printResult("UC1 (String Reversal)", input.equals(reversed));
     }
 
-    // --- UC4: Character Array (Two-Pointer) Method ---
-    public static void checkUsingCharArray(String input) {
+    // --- UC4: Character Array (Two-Pointer) ---
+    public static void checkUC4_CharArrayTwoPointer(String input) {
         char[] charArray = input.toCharArray();
         int start = 0, end = charArray.length - 1;
         boolean isPalindrome = true;
@@ -45,40 +41,58 @@ public class PalindromeCheckerApp {
             start++;
             end--;
         }
-        System.out.println("[UC4: Character Array] Result: " + (isPalindrome ? "Palindrome" : "NOT a Palindrome"));
+        printResult("UC4 (Char Array 2-Pointer)", isPalindrome);
     }
 
-    // --- UC5: Stack-Based Method ---
-    public static void checkUsingStack(String input) {
+    // --- UC5: Stack-Based (LIFO) ---
+    public static void checkUC5_StackLIFO(String input) {
         Stack<Character> stack = new Stack<>();
         for (char c : input.toCharArray()) stack.push(c);
+
         StringBuilder reversed = new StringBuilder();
         while (!stack.isEmpty()) reversed.append(stack.pop());
-        System.out.println("[UC5: Stack-Based] Result: " + (input.equals(reversed.toString()) ? "Palindrome" : "NOT a Palindrome"));
+
+        printResult("UC5 (Stack LIFO)", input.equals(reversed.toString()));
     }
 
-    // --- UC6: Queue + Stack Based Method ---
-    public static void checkUsingQueueAndStack(String input) {
+    // --- UC6: Stack + Queue (LIFO vs FIFO) ---
+    public static void checkUC6_StackAndQueue(String input) {
         Stack<Character> stack = new Stack<>();
         Queue<Character> queue = new LinkedList<>();
 
-        // Step 1: Push to Stack (LIFO) and Enqueue to Queue (FIFO)
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
+        for (char c : input.toCharArray()) {
             stack.push(c);
             queue.add(c);
         }
 
         boolean isPalindrome = true;
-
-        // Step 2: Compare Dequeue (Front) with Pop (Back)
         while (!stack.isEmpty()) {
             if (!stack.pop().equals(queue.remove())) {
                 isPalindrome = false;
                 break;
             }
         }
-
-        System.out.println("[UC6: Queue + Stack] Result: " + (isPalindrome ? "Palindrome" : "NOT a Palindrome"));
+        printResult("UC6 (Stack + Queue)", isPalindrome);
     }
-}g
+
+    // --- UC7: Deque-Based (Front & Rear) ---
+    public static void checkUC7_DequeOptimized(String input) {
+        Deque<Character> deque = new ArrayDeque<>();
+        for (char c : input.toCharArray()) deque.addLast(c);
+
+        boolean isPalindrome = true;
+        while (deque.size() > 1) {
+            if (!deque.removeFirst().equals(deque.removeLast())) {
+                isPalindrome = false;
+                break;
+            }
+        }
+        printResult("UC7 (Deque Optimized)", isPalindrome);
+    }
+
+    // Helper method to print results consistently
+    private static void printResult(String useCase, boolean isPalindrome) {
+        String status = isPalindrome ? "Palindrome" : "NOT a Palindrome";
+        System.out.printf("%-30s : %s%n", "[" + useCase + "]", status);
+    }
+}
