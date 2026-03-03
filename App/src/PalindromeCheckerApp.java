@@ -1,77 +1,71 @@
 import java.util.*;
 
-// Step 1: Define the Strategy Interface
-interface PalindromeStrategy {
-    boolean check(String text);
-}
+public class PalindromeCheckerApp {
 
-// Step 2: Implement Concrete Strategy - Stack Based
-class StackStrategy implements PalindromeStrategy {
-    @Override
-    public boolean check(String text) {
-        Stack<Character> stack = new Stack<>();
-        for (char c : text.toCharArray()) stack.push(c);
-        StringBuilder reversed = new StringBuilder();
-        while (!stack.isEmpty()) reversed.append(stack.pop());
-        return text.equalsIgnoreCase(reversed.toString());
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== UC13: Performance Comparison ===");
+        System.out.print("Enter a long string to test performance: ");
+        String input = scanner.nextLine();
+
+        // 1. Measure String Reversal (UC1)
+        long startUC1 = System.nanoTime();
+        checkUC1(input);
+        long endUC1 = System.nanoTime();
+        long durationUC1 = endUC1 - startUC1;
+
+        // 2. Measure Two-Pointer (UC4)
+        long startUC4 = System.nanoTime();
+        checkUC4(input);
+        long endUC4 = System.nanoTime();
+        long durationUC4 = endUC4 - startUC4;
+
+        // 3. Measure Stack Based (UC5)
+        long startUC5 = System.nanoTime();
+        checkUC5(input);
+        long endUC5 = System.nanoTime();
+        long durationUC5 = endUC5 - startUC5;
+
+        // Display Results in a Table format
+        System.out.println("\n--- Performance Results ---");
+        System.out.printf("%-25s | %-15s%n", "Algorithm", "Time (Nanoseconds)");
+        System.out.println("----------------------------------------------");
+        System.out.printf("%-25s | %-15d ns%n", "String Reversal (UC1)", durationUC1);
+        System.out.printf("%-25s | %-15d ns%n", "Two-Pointer (UC4)", durationUC4);
+        System.out.printf("%-25s | %-15d ns%n", "Stack-Based (UC5)", durationUC5);
+
+        System.out.println("\nNote: Lower nanoseconds indicate better performance.");
+
+        scanner.close();
     }
-}
 
-// Step 3: Implement Concrete Strategy - Two-Pointer Based
-class TwoPointerStrategy implements PalindromeStrategy {
-    @Override
-    public boolean check(String text) {
-        int left = 0, right = text.length() - 1;
-        while (left < right) {
-            if (Character.toLowerCase(text.charAt(left)) != Character.toLowerCase(text.charAt(right))) {
-                return false;
-            }
-            left++;
-            right--;
+    // Logic from UC1
+    public static boolean checkUC1(String input) {
+        String reversed = "";
+        for (int i = input.length() - 1; i >= 0; i--) {
+            reversed += input.charAt(i);
+        }
+        return input.equals(reversed);
+    }
+
+    // Logic from UC4
+    public static boolean checkUC4(String input) {
+        int start = 0, end = input.length() - 1;
+        while (start < end) {
+            if (input.charAt(start) != input.charAt(end)) return false;
+            start++;
+            end--;
         }
         return true;
     }
-}
 
-// Step 4: The Context Class that uses the Strategy
-class PalindromeContext {
-    private PalindromeStrategy strategy;
-
-    public void setStrategy(PalindromeStrategy strategy) {
-        this.strategy = strategy;
-    }
-
-    public boolean executeStrategy(String text) {
-        return strategy.check(text);
-    }
-}
-
-// Step 5: Main Application
-public class PalindromeCheckerApp {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        PalindromeContext context = new PalindromeContext();
-
-        System.out.print("Enter a string: ");
-        String input = scanner.nextLine();
-
-        System.out.println("\nSelect Strategy:");
-        System.out.println("1. Stack Strategy (LIFO)");
-        System.out.println("2. Two-Pointer Strategy (Optimized)");
-        int choice = scanner.nextInt();
-
-        // Polymorphism in action: Injecting the strategy at runtime
-        if (choice == 1) {
-            context.setStrategy(new StackStrategy());
-            System.out.println("Using: Stack Strategy");
-        } else {
-            context.setStrategy(new TwoPointerStrategy());
-            System.out.println("Using: Two-Pointer Strategy");
-        }
-
-        boolean result = context.executeStrategy(input);
-        System.out.println("Result: " + (result ? "Palindrome" : "NOT a Palindrome"));
-
-        scanner.close();
+    // Logic from UC5
+    public static boolean checkUC5(String input) {
+        Stack<Character> stack = new Stack<>();
+        for (char c : input.toCharArray()) stack.push(c);
+        StringBuilder sb = new StringBuilder();
+        while (!stack.isEmpty()) sb.append(stack.pop());
+        return input.equals(sb.toString());
     }
 }
